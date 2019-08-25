@@ -6,6 +6,13 @@ from collections import namedtuple
 MockSchema = namedtuple("MockSchema", ["version"])
 
 
+def wonky_sort_key(schema):
+    if schema.version:
+        return schema.version.split(".", 1)[-1]
+    else:
+        return "0"
+
+
 @pytest.fixture
 def basic():
     """Basic Version instance."""
@@ -69,3 +76,36 @@ def test_lookup_oldest(basic):
     assert basic.oldest('>1.0').version == '1.9'
     assert basic.oldest('>1000').version is None
     assert basic.oldest('>1000', match_unversioned=False) is None
+
+
+def test_sorting_returns_versions(basic):
+    assert isinstance(basic.sorted(wonky_sort_key), Versions)
+    assert isinstance(basic.sorted(wonky_sort_key, True), Versions)
+
+
+def test_sorting_keeps_length(basic):
+    assert len(basic.sorted(wonky_sort_key)) == len(basic)
+
+
+def test_sorted(basic):
+    assert [s.version for s in basic.sorted(version_sort_key)] == [
+        '0.9', '1.9', '5.3.2', '11.0', None]
+    assert [s.version for s in basic.sorted(version_sort_key, reverse=True)] == [
+        None, '11.0', '5.3.2', '1.9', '0.9']
+    assert [s.version for s in basic.sorted(wonky_sort_key)] == [
+        '11.0', None, '5.3.2', '0.9', '1.9']
+    assert [s.version for s in basic.sorted(wonky_sort_key, reverse=True)] == [
+        '0.9', '1.9', '5.3.2', '11.0', None]
+
+
+def test_filtered(basic):
+    assert [s.version for s in basic.filtered(
+        '==1.0', match_unversioned=False)] == []
+    assert [s.version for s in basic.filtered(
+        '~=1.0', match_unversioned=False)] == ['1.9']
+    assert [s.version for s in basic.filtered('~=1.0')] == ['1.9', None]
+    assert [s.version for s in basic.filtered('!=1.*')] == [
+        '5.3.2', '0.9', '11.0', None]
+    assert [s.version for s in basic.filtered('>=5.3.2')] == [
+        '5.3.2', '11.0', None]
+    assert [s.version for s in basic.filtered('>11')] == [None]

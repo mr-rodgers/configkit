@@ -22,6 +22,17 @@ class Versions(Sequence):
     def sorted(self, key: SortKey, reverse=False) -> 'Versions':
         return Versions(sorted(self, key=key, reverse=reverse))
 
+    def filtered(self, specifier: str, match_unversioned=True) -> 'Versions':
+        acceptable_versions = SpecifierSet(specifier)
+
+        def matches_requirements(sch):
+            if not sch.version:
+                return match_unversioned
+            else:
+                version = parse(sch.version)
+                return version in acceptable_versions
+        return Versions([sch for sch in self.versions if matches_requirements(sch)])
+
     def version(self, specifier: str, sort_key: Optional[SortKey] = None, reverse=False, match_unversioned=True) -> Optional['schema.Schema']:
         """Return the first schema that matches the version spec
 
@@ -33,22 +44,11 @@ class Versions(Sequence):
         :param match_unversioned: unless true, unversioned schemas
                                   will not count as matches
         """
-        acceptable_versions = SpecifierSet(specifier)
-        if sort_key is None:
-            schemas = reversed(self) if reverse else self
-        else:
-            schemas = self.sorted(sort_key, reverse)
-
-        for schema in schemas:
-            if not schema.version:
-                if match_unversioned:
-                    return schema
-                else:
-                    continue
-
-            version = parse(schema.version)
-            if version in acceptable_versions:
-                return schema
+        versions = self.filtered(specifier, match_unversioned)
+        try:
+            return next(iter(versions if sort_key is None else versions.sorted(sort_key, reverse)))
+        except StopIteration:
+            return None
 
     def newest(self, specifier: str = ">=0", match_unversioned=True) -> Optional['schema.Schema']:
         return self.version(specifier, version_sort_key, reverse=True, match_unversioned=match_unversioned)

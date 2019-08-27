@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://github.com/mr-rodgers/configkit/test/schemas/0.2/config.json",
+    "type": "object",
+    "properties": {
+        "connect_keep_alive": { "type": "boolean" },
+        "resource_name": { "type": "string" },
+        "credentials": { "$ref": "credentials.json" }
+    },
+    "required": ["resource_name"],
+    "additionalProperties": false
+}

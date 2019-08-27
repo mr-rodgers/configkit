@@ -36,6 +36,9 @@ class RegexMatcher(IMatcher):
     def __init__(self, pattern: str):
         self.pattern = pattern
 
+    def __repr__(self):
+        return "RegexMatcher(r{!r})".format(self.pattern)
+
     def check(self, path: str) -> Optional[SchemaInfo]:
         match = self._regexp.search(path)
         if match:

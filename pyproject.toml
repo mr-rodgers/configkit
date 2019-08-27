@@ -4,13 +4,17 @@ version = "0.1.0"
 description = "Easy to use versioned config files"
 authors = ["Te-jé Rodgers <tjd.rodgers@gmail.com>"]
 license = "Unlicense"
+repository = "https://github.com/mr-rodgers/configkit"
+include = ["tests/*.py", "tests/schemas/*.json"]
 
 [tool.poetry.dependencies]
 python = "^3.5"
 packaging = "^19.1"
+jsonschema = "^3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.1"
+pytest-mock = "^1.10"
 
 [build-system]
 requires = ["poetry>=0.12"]

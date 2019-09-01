@@ -13,7 +13,7 @@ schema_directory = SchemaDirectory("/path/to/json/schemas")
 # Use the latest "config" schema to load a config file
 config = schema_directory["config"].latest().load("/path/to/config.json")
 
-# Or get a specific version of a schema, and use
+# Or get a compatible version of a schema, and use
 # that to load the file
 credentials = schema_directory["credentials"].version("~=11.1.0").load("/path/to/credentials.json")
 ```

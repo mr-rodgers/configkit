@@ -1,7 +1,7 @@
 import pytest
 import shutil
 from pathlib import PurePath, Path
-from configkit import Directory
+from configkit import SchemaDirectory
 from configkit.matchers import version_name_matcher as vnm, name_version_matcher as nvm, RegexMatcher
 from configkit.versions import Versions
 from configkit.schema import Schema
@@ -73,17 +73,17 @@ def matcher(request):
 
 def test_length(path, matcher):
     print(matcher)
-    assert len(Directory(path, matcher)) == 2
+    assert len(SchemaDirectory(path, matcher)) == 2
 
 
 def test_keys(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     assert set(directory.keys()) == set(['config', 'credentials'])
     assert set(directory) == set(['config', 'credentials'])
 
 
 def test_every_schema_found(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
 
     assert {sch.id for sch in directory['config']} == {
         "https://github.com/mr-rodgers/configkit/test/schemas/{}/config.json".format(
@@ -97,7 +97,7 @@ def test_every_schema_found(path, matcher):
 
 
 def test_values_are_versions(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
 
     for name in directory:
         assert isinstance(directory[name], Versions)
@@ -107,7 +107,7 @@ def test_values_are_versions(path, matcher):
 
 
 def test_iter_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     for item in directory:
@@ -117,7 +117,7 @@ def test_iter_scans_once(path, matcher, mocker):
 
 
 def test_lookup_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     directory['config']
@@ -126,7 +126,7 @@ def test_lookup_scans_once(path, matcher, mocker):
 
 
 def test_len_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     len(directory)
@@ -135,7 +135,7 @@ def test_len_scans_once(path, matcher, mocker):
 
 
 def test_membership_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     "config" in directory
@@ -144,7 +144,7 @@ def test_membership_scans_once(path, matcher, mocker):
 
 
 def test_keys_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     list(directory.keys())
@@ -153,7 +153,7 @@ def test_keys_scans_once(path, matcher, mocker):
 
 
 def test_values_scans_once(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     list(directory.values())
@@ -162,7 +162,7 @@ def test_values_scans_once(path, matcher, mocker):
 
 
 def test_scans_once_with_use_cache(path, matcher, mocker):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     mocker.spy(directory, 'find')
 
     with directory.use_cache():
@@ -184,7 +184,7 @@ def test_scans_once_with_use_cache(path, matcher, mocker):
 
 
 def test_use_cache_gives_correct_results(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
     with directory.use_cache():
         assert len(directory) == 2
         assert set(directory) == set(['credentials', 'config'])
@@ -202,7 +202,7 @@ def test_use_cache_gives_correct_results(path, matcher):
 
 
 def test_schemas_iterates_schema_instances(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
 
     specs = [None, '==0.2', '~=1.0', '<1']
 
@@ -212,7 +212,7 @@ def test_schemas_iterates_schema_instances(path, matcher):
 
 
 def test_schemas_iterates_correct_schema_ids(path, matcher):
-    directory = Directory(path, matcher)
+    directory = SchemaDirectory(path, matcher)
 
     assert {s.id for s in directory.schemas()} == {
         "https://github.com/mr-rodgers/configkit/test/schemas/0.1/config.json",

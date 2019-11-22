@@ -11,6 +11,7 @@ include = ["tests/*.py", "tests/schemas/*.json"]
 python = "^3.5"
 packaging = "^19.1"
 jsonschema = "^3.0"
+jsonpath-rw = "^1.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.1"

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from pathlib import PurePath
-from typing import NamedTuple, Optional, Any
+from typing import NamedTuple, Optional
 import re
 
 
